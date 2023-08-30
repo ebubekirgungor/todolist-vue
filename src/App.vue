@@ -1,33 +1,86 @@
 <template>
   <div class="text-center">
-    <v-btn color="primary" class="my-16" @click="add_dialog = true"> Add Todo </v-btn>
-    <v-card class="mx-auto my-4" width="400px">
+    <v-btn color="primary" class="my-16" @click="add_dialog = true">
+      Add Todo
+    </v-btn>
+    <v-card class="text-left mx-auto" width="400px">
       <v-table>
         <tbody>
-          <tr v-for="todo in todos" :key="todo.text">
+          <tr style="height: 10px" v-for="todo in todos" :key="todo.id">
+            <td>
+              <v-checkbox
+                style="margin-right: -35px; margin-bottom: -21px"
+                v-model="todo.done"
+              ></v-checkbox>
+            </td>
             <td>{{ todo.text }}</td>
-            <v-row align="center" justify="center">
-            <v-col cols="auto">
-            <v-btn icon="mdi-text-box-edit-outline" size="x-small"></v-btn>
-            <v-btn icon="mdi-trash-can-outline" size="x-small"></v-btn>
-          </v-col>
-        </v-row>
+            <td style="width: 0px">
+              <v-btn
+                @click="open_edit_dialog(todo.id)"
+                icon="mdi-text-box-edit-outline"
+                size="small"
+              ></v-btn>
+            </td>
+            <td style="width: 0px">
+              <v-btn @click="delete_todo(todo.id)" icon="mdi-trash-can-outline" size="small"></v-btn>
+            </td>
           </tr>
         </tbody>
       </v-table>
     </v-card>
   </div>
-  <v-dialog v-model="add_dialog" width="150px">
+  <v-dialog v-model="add_dialog" width="400px">
     <v-card>
-      <v-card-title class="text-h5">
-          Add Todo
-        </v-card-title>
-        <v-text-field v-model="todo_text"
-                  required
-                ></v-text-field>
+      <v-card-title
+        style="
+          margin-top: 20px;
+          pointer-events: none;
+          user-select: none;
+          text-align: center;
+        "
+        class="text-h5"
+      >
+        Add Todo
+      </v-card-title>
+      <v-row justify="center" class="ma-7">
+        <v-text-field
+          style="width: 300px"
+          v-model="todo_text"
+          required
+        ></v-text-field>
+      </v-row>
       <v-card-actions>
+        <v-spacer></v-spacer>
         <v-btn color="primary" @click="add_todo">Add</v-btn>
         <v-btn color="primary" @click="add_dialog = false">Close</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <v-dialog v-model="edit_dialog" width="400px">
+    <v-card>
+      <v-card-title
+        style="
+          margin-top: 20px;
+          pointer-events: none;
+          user-select: none;
+          text-align: center;
+        "
+        class="text-h5"
+      >
+        Edit Todo
+      </v-card-title>
+      <v-row justify="center" class="ma-7">
+        <v-text-field
+          style="width: 300px"
+          v-model="update_text"
+          required
+        ></v-text-field>
+      </v-row>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="primary" @click="edit_todo(edit_id)">Edit</v-btn>
+        <v-btn color="primary" @click="edit_dialog = false">Close</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -39,16 +92,37 @@ export default {
     return {
       todos: [],
       add_dialog: false,
+      edit_dialog: false,
+      edit_id: 0,
     };
   },
   methods: {
-    add_todo(todo) {
+    add_todo() {
+      if (this.todo_text === "") {
+        return;
+      }
       this.todos.push({
         id: Date.now(),
         text: this.todo_text,
         done: false,
       });
+      this.todo_text = "";
     },
+    edit_todo(id) {
+      if (this.update_text === "") {
+        return;
+      }
+      this.todos.find(todo => todo.id === id).text = this.update_text;
+      this.edit_dialog = false;
+    },
+    delete_todo(id) {
+      this.todos.splice(this.todos.findIndex(todo => todo.id === id), 1);
+    },
+    open_edit_dialog(id) {
+      this.edit_dialog = true;
+      this.update_text = this.todos.find(todo => todo.id === id).text;
+      this.edit_id = id;
+    }
   },
 };
 </script>
@@ -56,5 +130,8 @@ export default {
 <style>
 body {
   background-color: #f5f5f5;
+}
+.v-table__wrapper {
+  overflow: hidden !important;
 }
 </style>
