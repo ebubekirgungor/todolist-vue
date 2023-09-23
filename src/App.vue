@@ -3,7 +3,7 @@
     <v-btn color="primary" class="my-16" @click="add_dialog = true">
       Add Todo
     </v-btn>
-    <v-card class="text-left mx-auto" width="400px">
+    <v-card class="text-left mx-auto" width="390px" >
       <v-table>
         <tbody>
           <tr style="height: 10px" v-for="todo in todos" :key="todo.id">
@@ -124,6 +124,9 @@ export default {
 };
 </script>
 <style>
+html {
+  overflow: hidden !important;
+}
 body {
   background-color: #f5f5f5;
 }
